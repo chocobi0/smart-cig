@@ -1,0 +1,19 @@
+{
+  "name": "person",
+  "mongodb": {
+    "collection": "PostCollection"
+  },
+  "plural": "people",
+  "base": "User",
+  "idInjection": true,
+  "properties": {
+    "firstname": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}
