@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers'])
+angular.module('starter', ['ionic', 'lbServices','bd.timedistance', 'starter.login', 'starter.register'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -19,10 +19,25 @@ angular.module('starter', ['ionic', 'starter.controllers'])
     }
   });
 })
+  .run(function (User) {
+    //Check if User is authenticated
+    if (User.getCachedCurrent() == null) {
+      User.getCurrent();
+    }
+  })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
   $stateProvider
-
+    .state('login', {
+      url: '/login',
+      templateUrl: 'templates/login.html',
+      controller: 'LoginCtrl'
+    })
+    .state('register', {
+      url: '/register',
+      templateUrl: 'templates/register.html',
+      controller: 'RegisterCtrl'
+    })
   .state('app', {
     url: "/app",
     abstract: true,
@@ -67,5 +82,17 @@ angular.module('starter', ['ionic', 'starter.controllers'])
     }
   });
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/playlists');
+    $urlRouterProvider.otherwise('/login');
+    $httpProvider.interceptors.push(function ($q, $location) {
+      return {
+        responseError: function (rejection) {
+          console.log("Redirect");
+          if (rejection.status == 401 && $location.path() !== '/login' && $location.path() !== '/register') {
+            $location.nextAfterLogin = $location.path();
+            $location.path('/login');
+          }
+          return $q.reject(rejection);
+        }
+      };
+    });
 });
